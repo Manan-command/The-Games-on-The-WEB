@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snake Game</title>
+  <style>
+    body {
+      background-color: #f0f8ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    canvas {
+      background-color: #222;
+      border: 2px solid #4caf50;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+  <script>
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+
+  const gridSize = 20;
+  const tileCount = canvas.width / gridSize;
+  let snake = [{ x: 10, y: 10 }];
+  let food = { x: 5, y: 5 };
+  let dx = 0;
+  let dy = 0;
+  let started = false;
+
+  function gameLoop() {
+    if (dx !== 0 || dy !== 0) {
+      update();
+    }
+    draw();
+  }
+
+  function update() {
+    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+    // Check for wall or self collision
+    if (
+      head.x < 0 || head.x >= tileCount ||
+      head.y < 0 || head.y >= tileCount ||
+      snake.some(segment => segment.x === head.x && segment.y === head.y)
+    ) {
+      alert("Game Over!");
+      snake = [{ x: 10, y: 10 }];
+      dx = dy = 0;
+      started = false;
+      return;
+    }
+
+    snake.unshift(head);
+
+    if (head.x === food.x && head.y === food.y) {
+      food = {
+        x: Math.floor(Math.random() * tileCount),
+        y: Math.floor(Math.random() * tileCount)
+      };
+    } else {
+      snake.pop();
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = "#222";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#0f0";
+    snake.forEach(segment => {
+      ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+    });
+
+    ctx.fillStyle = "red";
+    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+  }
+
+  document.addEventListener("keydown", e => {
+    switch (e.key) {
+      case "ArrowUp":
+        if (dy === 0) { dx = 0; dy = -1; started = true; }
+        break;
+      case "ArrowDown":
+        if (dy === 0) { dx = 0; dy = 1; started = true; }
+        break;
+      case "ArrowLeft":
+        if (dx === 0) { dx = -1; dy = 0; started = true; }
+        break;
+      case "ArrowRight":
+        if (dx === 0) { dx = 1; dy = 0; started = true; }
+        break;
+    }
+  });
+
+  setInterval(gameLoop, 100);
+</script>
+</body>
+</html>

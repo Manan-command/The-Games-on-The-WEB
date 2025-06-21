@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Memory Match</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #fdf6e3;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 50px;
+    }
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: #eee;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .matched {
+      background-color: #c8e6c9;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <h1>Memory Match</h1>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const emojis = ["🍎", "🚗", "🐶", "🎵", "🌟", "🎮", "⚽", "🍕"];
+    const cards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+    const grid = document.getElementById("grid");
+
+    let firstCard = null;
+    let lock = false;
+
+    cards.forEach((emoji, index) => {
+      const div = document.createElement("div");
+      div.classList.add("card");
+      div.dataset.index = index;
+      div.dataset.emoji = emoji;
+      div.innerText = "";
+
+      div.addEventListener("click", () => {
+        if (lock || div.classList.contains("matched") || div.innerText !== "") return;
+
+        div.innerText = emoji;
+
+        if (!firstCard) {
+          firstCard = div;
+        } else {
+          if (firstCard.dataset.emoji === div.dataset.emoji) {
+            firstCard.classList.add("matched");
+            div.classList.add("matched");
+            firstCard = null;
+          } else {
+            lock = true;
+            setTimeout(() => {
+              firstCard.innerText = "";
+              div.innerText = "";
+              firstCard = null;
+              lock = false;
+            }, 1000);
+          }
+        }
+      });
+
+      grid.appendChild(div);
+    });
+  </script>
+</body>
+</html>
